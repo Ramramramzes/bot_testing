@@ -26,7 +26,8 @@ def start(message):
         else:
             markup = telebot.types.InlineKeyboardMarkup()
             markup.add(telebot.types.InlineKeyboardButton('Список пользователей', callback_data='users'))
-            bot.send_message(message.chat.id,'Здарова админ',reply_markup=markup)
+            bot_msg = bot.send_message(message.chat.id,'Здарова админ',reply_markup=markup)
+            bot.delete_message(message.chat.id, message.id)
 
     else:
         bot_msg = bot.send_message(message.chat.id, 'Сейчас зарегистрируем\nВведите имя')
@@ -62,6 +63,8 @@ def user_pass(message):
     bot.delete_message(message.chat.id, message.id)
 @bot.callback_query_handler(func=lambda call: call.data == 'users')
 def users(call):
+    global bot_msg
+
     conn = sqlite3.connect('data.sql')
     cur = conn.cursor()
 
@@ -74,13 +77,21 @@ def users(call):
 
     if data:
         user_list = "\n".join([f"===============\nID: {row[0]}\nName: {row[1]}\nPassword: {row[2]}\n" for row in data])
-        bot.send_message(call.message.chat.id, user_list)
-        print(user_list)
+        markup = telebot.types.InlineKeyboardMarkup()
+        markup.add(telebot.types.InlineKeyboardButton('Назад', callback_data='adm_list'))
+        bot.send_message(call.message.chat.id, user_list,reply_markup=markup)
+        bot.delete_message(call.message.chat.id, bot_msg.message_id)
+
     else:
         bot.send_message(call.message.chat.id, 'Пользователей нет')
 
+@bot.callback_query_handler(func=lambda call: call.data == 'adm_list')
+def adm_list(call):
+    global bot_msg
 
-
-
+    markup = telebot.types.InlineKeyboardMarkup()
+    markup.add(telebot.types.InlineKeyboardButton('Список пользователей', callback_data='users'))
+    bot_msg = bot.send_message(call.message.chat.id, 'Здарова админ', reply_markup=markup)
+    bot.delete_message(call.message.chat.id, call.message.id)
 
 bot.polling(none_stop=True)
