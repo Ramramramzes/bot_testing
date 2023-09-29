@@ -1,7 +1,7 @@
 import telebot
 import sqlite3
-
-bot = telebot.TeleBot('Token')
+from data import myToken
+bot = telebot.TeleBot(myToken)
 name = ''
 bot_msg = 0
 @bot.message_handler(commands=['start'])
