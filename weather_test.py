@@ -1,8 +1,14 @@
 import telebot
 import requests
 import json
-from data import myToken
-from data import myApiWeather
+
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+myToken = os.getenv('myToken')
+myApiWeather = os.getenv('myApiWeather')
+
 
 global lat,lon
 
