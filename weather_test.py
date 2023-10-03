@@ -45,11 +45,19 @@ def send_lon(message):
 
 def send_data(message):
   global lat,lon,user_msg
+  markup = telebot.types.InlineKeyboardMarkup()
+  markup.add(telebot.types.InlineKeyboardButton('Сначала',callback_data='/start'))
+
   # print(f'https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={myApiWeather}&units=metric')
   req = requests.get(f'https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={myApiWeather}&units=metric')
   # #todo/-/  в конце url для выдачи в градусах ==> &units=metric 
   weather_data = json.loads(req.text)
   temperature = weather_data['list'][0]['main']['temp']
-  bot.send_message(message.chat.id,f'Температура по координатам:\n{lat},{lon}\n' + str(temperature) + ' °C')
+  bot.send_message(message.chat.id,f'Температура по координатам:\n{lat},{lon}\n' + str(temperature) + ' °C',reply_markup=markup)
 
+  @bot.callback_query_handler(func=lambda call: True)
+  def handle_callback(call):
+      if call.data == '/start':
+          start(call.message)
+          
 bot.polling(none_stop=True)
