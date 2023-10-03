@@ -1,6 +1,11 @@
 import telebot
 import sqlite3
-from data import myToken
+
+from dotenv import load_dotenv
+import os
+load_dotenv()
+myToken = os.getenv('myToken')
+
 bot = telebot.TeleBot(myToken)
 name = ''
 bot_msg = 0
